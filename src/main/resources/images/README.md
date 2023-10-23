@@ -1,0 +1,1 @@
+Do not change the `resources/images` folder. You don't need to do anything here.
