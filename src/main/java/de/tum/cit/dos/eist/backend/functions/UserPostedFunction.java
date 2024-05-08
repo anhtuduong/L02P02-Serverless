@@ -30,7 +30,8 @@ public class UserPostedFunction implements RequestHandler<S3Event, String> {
 
     @Override
     public String handleRequest(S3Event event, Context context) {
-        // TODO: Implement the 3. Part of the exercise
+        String userId = getUserIdFromEvent(event);
+        String userDisplayName = repository.getUser(userId).displayName();
 
         // The event contains the records that have been uploaded to the S3. In
         // theory, there could be multiple records in one event (user uploads
@@ -41,8 +42,20 @@ public class UserPostedFunction implements RequestHandler<S3Event, String> {
             // to get the image from the S3 bucket which triggered the event.
             String key = record.getS3().getObject().getKey();
 
-            // TODO: Implement the 3. Part of the exercise
+            // Blur the image that triggered the S3 event
+
+            // Update the blurred image in the S3 bucket
         }
+
+        // Notify the user's friends that the user has posted
+        // with the following message: "NAME has posted their BeUnreal."
+        for (User user : repository.getAllUsers()) {
+            String message = userDisplayName + " has posted their BeUnreal.";
+            awsSns.sendPushNotification(user, message);
+        }
+
+        // Update the state of the user
+        repository.updateHasPostedToday(userId, true);
 
         return "Image processing complete.";
     }
