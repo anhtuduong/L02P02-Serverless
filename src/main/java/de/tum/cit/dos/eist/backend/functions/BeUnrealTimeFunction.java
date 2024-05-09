@@ -41,7 +41,7 @@ public class BeUnrealTimeFunction
     }
 
     private void deleteImage(String userId, String folderName) {
-        String imagePath = folderName + "/" + userId + ".jpg";
-        fileStorage.deleteFile(imagePath);
+        String objectKey = folderName + "/" + userId + ".jpg";
+        fileStorage.deleteFile(objectKey);
     }
 }

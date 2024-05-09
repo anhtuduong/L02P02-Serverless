@@ -46,10 +46,11 @@ public class UserPostedFunction implements RequestHandler<S3Event, String> {
             try {
                 // Blur the image that triggered the S3 event
                 BufferedImage originalImage = fileStorage.getImageFile(key);
-                BufferedImage blurredImage = blurringService.applyBlur(originalImage);
+                // For now the blurring not working
+//                BufferedImage blurredImage = blurringService.applyBlur(originalImage);
 
-                // Update the blurred image in the S3 bucket
-                uploadImage(blurredImage, userId, FileStorage.BLURRED_IMAGES_FOLDER);
+                // Update the image in the S3 bucket
+                uploadImage(originalImage, userId, FileStorage.BLURRED_IMAGES_FOLDER);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -57,7 +58,7 @@ public class UserPostedFunction implements RequestHandler<S3Event, String> {
 
         // Notify the user's friends that the user has posted
         // with the following message: "NAME has posted their BeUnreal."
-        for (User user : repository.getAllUsers()) {
+        for (User user : repository.getFriends(userId)) {
             String message = userDisplayName + " has posted their BeUnreal.";
             awsSns.sendPushNotification(user, message);
         }
