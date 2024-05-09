@@ -1,6 +1,7 @@
 package de.tum.cit.dos.eist.backend.functions;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -42,9 +43,16 @@ public class UserPostedFunction implements RequestHandler<S3Event, String> {
             // to get the image from the S3 bucket which triggered the event.
             String key = record.getS3().getObject().getKey();
 
-            // Blur the image that triggered the S3 event
+            try {
+                // Blur the image that triggered the S3 event
+                BufferedImage originalImage = fileStorage.getImageFile(key);
+                BufferedImage blurredImage = blurringService.applyBlur(originalImage);
 
-            // Update the blurred image in the S3 bucket
+                // Update the blurred image in the S3 bucket
+                uploadImage(blurredImage, userId, FileStorage.BLURRED_IMAGES_FOLDER);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         // Notify the user's friends that the user has posted
@@ -66,5 +74,10 @@ public class UserPostedFunction implements RequestHandler<S3Event, String> {
             return record.getS3().getObject().getKey().split("/")[1].split("\\.")[0];
         }
         return null;
+    }
+
+    private void uploadImage(BufferedImage image, String userId, String folderName) throws IOException {
+        String key = folderName + "/" + userId + ".jpg";
+        fileStorage.uploadImageFile(image, key);
     }
 }
