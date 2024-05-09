@@ -3,13 +3,13 @@
     {
       "Id": "user-posted",
       "LambdaFunctionArn": "arn:aws:lambda:us-east-1:000000000000:function:user-posted",
-      "Events": ["TODO"],
+      "Events": ["s3:ObjectCreated:Post"],
       "Filter": {
         "Key": {
           "FilterRules": [
             {
-              "Name": "TODO",
-              "Value": "TODO"
+              "Name": "prefix",
+              "Value": "FilterRuleValue"
             }
           ]
         }
