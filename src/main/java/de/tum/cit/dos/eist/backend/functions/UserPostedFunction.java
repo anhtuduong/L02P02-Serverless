@@ -34,6 +34,16 @@ public class UserPostedFunction implements RequestHandler<S3Event, String> {
         String userId = getUserIdFromEvent(event);
         String userDisplayName = repository.getUser(userId).displayName();
 
+        // Update the state of the user
+        repository.updateHasPostedToday(userId, true);
+
+        // Notify the user's friends that the user has posted
+        // with the following message: "NAME has posted their BeUnreal."
+        for (User user : repository.getFriends(userId)) {
+            String message = userDisplayName + " has posted their BeUnreal.";
+            awsSns.sendPushNotification(user, message);
+        }
+
         // The event contains the records that have been uploaded to the S3. In
         // theory, there could be multiple records in one event (user uploads
         // multiple images at once). But in our case, the user can only upload
@@ -46,25 +56,14 @@ public class UserPostedFunction implements RequestHandler<S3Event, String> {
             try {
                 // Blur the image that triggered the S3 event
                 BufferedImage originalImage = fileStorage.getImageFile(key);
-                // For now the blurring not working
-//                BufferedImage blurredImage = blurringService.applyBlur(originalImage);
+                BufferedImage blurredImage = blurringService.applyBlur(originalImage);
 
                 // Update the image in the S3 bucket
-                uploadImage(originalImage, userId, FileStorage.BLURRED_IMAGES_FOLDER);
+                uploadImage(blurredImage, userId, FileStorage.BLURRED_IMAGES_FOLDER);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-
-        // Notify the user's friends that the user has posted
-        // with the following message: "NAME has posted their BeUnreal."
-        for (User user : repository.getFriends(userId)) {
-            String message = userDisplayName + " has posted their BeUnreal.";
-            awsSns.sendPushNotification(user, message);
-        }
-
-        // Update the state of the user
-        repository.updateHasPostedToday(userId, true);
 
         return "Image processing complete.";
     }

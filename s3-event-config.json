@@ -8,8 +8,8 @@
         "Key": {
           "FilterRules": [
             {
-              "Name": "prefix",
-              "Value": "FilterRuleValue"
+              "Name": "suffix",
+              "Value": ".jpg"
             }
           ]
         }
