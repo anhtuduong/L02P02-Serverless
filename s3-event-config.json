@@ -3,7 +3,7 @@
     {
       "Id": "user-posted",
       "LambdaFunctionArn": "arn:aws:lambda:us-east-1:000000000000:function:user-posted",
-      "Events": ["s3:ObjectCreated:Post"],
+      "Events": ["s3:ObjectCreated:Put"],
       "Filter": {
         "Key": {
           "FilterRules": [
